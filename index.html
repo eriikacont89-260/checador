@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="theme-color" content="#691C32">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Checador">
+<script>window.API_URL = "https://script.google.com/macros/s/AKfycbx2tyJtg3XOwG1DbfSdWPDkFDdkW_96dnZMBIaxQXPFR49Fra4OKNazpumLcJZUmzsK/exec";</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checador de asistencia</title>
+<style>
+:root{
+  --guinda:#691C32; --guinda2:#9F2241; --oro:#BC955C;
+  --verde:#1E6B52; --verde-s:#E2F1EA; --rojo-s:#FBE3E1; --ambar-s:#FCF0D4; --azul:#1F4E79; --azul-s:#E3ECF5;
+  --tinta:#1B1F23; --gris:#5C6670; --linea:#D9DEE3; --fondo:#F3F4F5; --blanco:#FFFFFF;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--fondo);color:var(--tinta);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+header{background:var(--guinda);color:#fff;padding:14px 18px 12px;border-bottom:4px solid var(--oro)}
+header h1{margin:0;font-size:1.12rem;font-weight:700}
+header p{margin:2px 0 0;font-size:.84rem;opacity:.88;min-height:1em}
+.wrap{max-width:520px;margin:0 auto;padding:16px 16px 28px}
+.reloj{text-align:center;background:var(--blanco);border:1px solid var(--linea);border-radius:16px;padding:18px 12px 14px}
+.reloj .t{font-size:clamp(3.3rem,17vw,4.8rem);font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.reloj .t small{font-size:.36em;font-weight:700;color:var(--gris);margin-left:3px;vertical-align:.9em}
+.reloj .d{margin-top:8px;color:var(--gris);font-size:.95rem}
+.reloj .d::first-letter{text-transform:uppercase}
+label{display:block;font-weight:700;font-size:.92rem;margin:18px 0 6px}
+select,input{width:100%;font:inherit;font-size:1.05rem;padding:13px 12px;border:1.5px solid var(--linea);border-radius:12px;background:var(--blanco);color:var(--tinta)}
+input{-webkit-appearance:none;appearance:none}
+select:disabled{opacity:.6}
+:focus-visible{outline:3px solid var(--oro);outline-offset:2px}
+.fila{display:flex;gap:8px}
+.fila input{flex:1;font-size:1.3rem;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.ir{border:0;border-radius:12px;background:var(--guinda);color:#fff;font:inherit;font-weight:800;padding:0 18px;cursor:pointer}
+.ir:disabled{background:#B7BEC5}
+.ir.ancho{display:block;width:100%;margin-top:16px;padding:15px;font-size:1.05rem}
+.paso-tit{margin:22px 2px 2px;font-size:1.12rem}
+.ver{border:1.5px solid var(--linea);border-radius:12px;background:var(--blanco);font:inherit;font-weight:700;color:var(--gris);padding:0 14px;cursor:pointer}
+.fila input[type=password]{letter-spacing:normal;font-size:1.05rem}
+.cv-opc{margin:16px 0 2px;padding:12px 14px;border-radius:14px;background:var(--blanco);border:1.5px solid var(--linea)}
+.cv-opc .chk{display:flex;align-items:center;gap:10px;margin:0;font-size:.98rem;cursor:pointer}
+.cv-opc .chk input{width:22px;height:22px;accent-color:var(--guinda);flex:none}
+.cv-opc label[for=cvSel]{margin-top:12px}
+.ayuda{margin-top:10px;padding:10px 12px;border-radius:12px;background:#E9EDF1;color:var(--gris);font-size:.9rem}
+.nota{margin:6px 2px 0;font-size:.85rem;color:var(--gris)}
+.err{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--rojo-s);color:#7A1A14;font-size:.92rem}
+.geo{margin-top:10px;padding:10px 12px;border-radius:12px;font-size:.92rem}
+.geo.ok{background:var(--verde-s);color:#0E4634}
+.geo.bad{background:var(--rojo-s);color:#7A1A14}
+.geo.warn{background:var(--ambar-s);color:#5A3C00}
+.geo.info{background:#E9EDF1;color:var(--gris)}
+[hidden]{display:none!important}
+.lnk{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;text-decoration:underline;cursor:pointer}
+.chico{display:inline-block;margin-top:12px;font-size:.88rem;color:var(--guinda2)}
+.estado{margin-top:16px;font-size:.95rem;padding:12px 14px;border-left:4px solid var(--oro);background:var(--blanco);border-radius:0 12px 12px 0}
+.estado .nom{font-size:1.08rem;font-weight:800}
+.botones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.big{border:0;border-radius:16px;padding:26px 8px 22px;font:inherit;font-size:1.32rem;font-weight:800;letter-spacing:.06em;color:#fff;cursor:pointer;touch-action:manipulation;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.big small,.mid small{display:block;font-size:.7rem;font-weight:600;letter-spacing:.02em;opacity:.92;margin-top:5px}
+.entrada{background:var(--verde)}
+.salida{background:var(--guinda2)}
+.te-tit{margin:22px 2px 0;font-size:.85rem;font-weight:800;letter-spacing:.06em;color:var(--azul);text-transform:uppercase}
+.botones.te{margin-top:8px}
+.mid{border:2px solid var(--azul);border-radius:14px;padding:14px 8px 12px;font:inherit;font-size:1.02rem;font-weight:800;letter-spacing:.04em;color:var(--azul);background:var(--azul-s);cursor:pointer;touch-action:manipulation}
+.big:disabled,.mid:disabled{background:#B7BEC5;border-color:#B7BEC5;color:#fff;box-shadow:none;cursor:not-allowed}
+.big.sugerido,.mid.sugerido{outline:4px solid var(--oro);outline-offset:3px}
+.big:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.perm{margin-top:22px;background:var(--blanco);border:1.5px solid var(--linea);border-radius:16px;padding:14px 14px 12px}
+.perm h2{margin:0 0 4px;font-size:1rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.perm p{margin:4px 0 10px;font-size:.9rem;color:var(--gris)}
+.perm .est{font-size:.95rem;padding:9px 11px;border-radius:12px;margin-bottom:10px}
+.perm .est.ok{background:var(--verde-s);color:#0E4634}.perm .est.bad{background:var(--rojo-s);color:#7A1A14}.perm .est.info{background:#E9EDF1;color:var(--gris)}
+.sec{width:100%;padding:13px;border-radius:12px;border:1.5px solid var(--linea);background:var(--blanco);font:inherit;font-weight:700;color:var(--tinta);cursor:pointer}
+.chip{font-size:.72rem;font-weight:700;background:var(--verde-s);color:#0E4634;border-radius:99px;padding:3px 9px}
+footer{max-width:520px;margin:0 auto;padding:0 16px 30px;color:var(--gris);font-size:.8rem}
+.modal{position:fixed;inset:0;background:rgba(15,18,22,.58);display:flex;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal[hidden]{display:none}
+.card{background:#fff;border-radius:20px;max-width:440px;width:100%;padding:26px 22px 20px;text-align:center;max-height:92vh;overflow:auto}
+.card .ic{width:72px;height:72px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+.card.ok .ic{background:var(--verde-s)}
+.card.bad .ic{background:var(--rojo-s)}
+.card h2{margin:4px 0 4px;font-size:1.2rem;letter-spacing:.05em}
+.card .hora{font-size:3.1rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.card .det{color:var(--gris);font-size:.96rem;margin-top:8px}
+.card .msg{color:var(--tinta);font-size:1rem;margin-top:8px}
+.card .obs{margin-top:14px;text-align:left;font-size:.88rem;background:var(--ambar-s);color:#5A3C00;padding:10px 12px;border-radius:12px}
+.card .acc{margin-top:18px;width:100%;padding:15px;border:0;border-radius:14px;background:var(--tinta);color:#fff;font:inherit;font-weight:700;font-size:1.02rem;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="titulo">Checador de asistencia</h1>
+  <p id="subtitulo">Cargando…</p>
+</header>
+
+<main class="wrap">
+  <section class="reloj" aria-label="Hora actual">
+    <div class="t"><span id="hm">--:--</span><small id="seg"></small></div>
+    <div class="d" id="fecha"></div>
+  </section>
+
+  <section id="pasoTel">
+    <h2 class="paso-tit">Entra con tu cuenta</h2>
+    <label for="tel">Usuario: tu número de celular</label>
+    <input id="tel" type="tel" inputmode="numeric" autocomplete="username" maxlength="14" placeholder="10 dígitos">
+    <label for="pw">Contraseña</label>
+    <div class="fila">
+      <input id="pw" type="password" autocomplete="current-password" maxlength="40" placeholder="Tu contraseña">
+      <button type="button" class="ver" id="verPw" aria-label="Mostrar contraseña">Ver</button>
+    </div>
+    <button type="button" class="ir ancho" id="btnTel">Entrar</button>
+    <div class="err" id="telErr" hidden></div>
+    <p class="nota">Este celular recordará tu sesión; no tendrás que escribirla cada vez.</p>
+    <button type="button" class="lnk chico" id="aCrear">¿Es tu primera vez? Crea tu cuenta</button><br>
+    <button type="button" class="lnk chico" id="aOlvide">Olvidé mi contraseña</button>
+    <div class="ayuda" id="olvideTxt" hidden>Pide a tu supervisora que restablezca tu acceso. Después vuelve a crear tu cuenta con tu número de celular.</div>
+    <br><button type="button" class="lnk chico" id="aLista" hidden>Registrar eligiendo mi nombre de la lista</button>
+  </section>
+
+  <section id="pasoCuenta" hidden>
+    <h2 class="paso-tit">Crear mi cuenta</h2>
+    <p class="nota">Solo se hace una vez. Tu número de celular será tu usuario.</p>
+    <label for="cuU">Tu unidad</label>
+    <select id="cuU" disabled><option>Cargando unidades…</option></select>
+    <label for="cuP">Tu nombre</label>
+    <select id="cuP" disabled><option>Primero elige tu unidad</option></select>
+    <label for="cuTel">Tu número de celular</label>
+    <input id="cuTel" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="14" placeholder="10 dígitos">
+    <label for="cuPw">Crea una contraseña</label>
+    <input id="cuPw" type="password" autocomplete="new-password" maxlength="40" placeholder="Mínimo 6 letras o números">
+    <label for="cuPw2">Escríbela otra vez</label>
+    <input id="cuPw2" type="password" autocomplete="new-password" maxlength="40">
+    <button type="button" class="ir ancho" id="btnCrear">Crear mi cuenta</button>
+    <div class="err" id="cuErr" hidden></div>
+    <button type="button" class="lnk chico" id="aVolver">Ya tengo cuenta: entrar</button>
+  </section>
+
+  <section id="pasoLista" hidden>
+    <label for="selUnidad">Unidad donde estás</label>
+    <select id="selUnidad" disabled><option>Cargando unidades…</option></select>
+    <label for="selPersona">Tu nombre</label>
+    <select id="selPersona" disabled><option>Primero elige la unidad</option></select>
+    <button type="button" class="lnk chico" id="aTel">Entrar con mi cuenta (usuario y contraseña)</button>
+  </section>
+
+  <div id="quien" class="estado" hidden></div>
+  <div id="geo" class="geo info" hidden></div>
+  <div id="avisoRed" class="geo warn" hidden><b>Sin internet.</b> Puedes marcar: tu registro se guarda en este celular con su hora y se envía solo cuando regrese la señal.</div>
+  <div id="cola" class="geo warn" hidden aria-live="polite"></div>
+
+  <div id="pinBox" hidden>
+    <label for="pin">Tu PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Escribe tu PIN">
+  </div>
+
+  <div id="acciones" hidden>
+  <div id="cvOpc" class="cv-opc" hidden>
+    <label class="chk"><input type="checkbox" id="cvChk"> Hoy trabajo por otra persona (convenio)</label>
+    <div id="cvSelBox" hidden>
+      <label for="cvSel">¿A quién cubres?</label>
+      <select id="cvSel"><option value="">Elige a la persona</option></select>
+      <p class="nota">Marca tu ENTRADA como siempre. Tu supervisora revisará el convenio.</p>
+    </div>
+  </div>
+  <div class="botones">
+    <button type="button" class="big entrada" id="btnEntrada" disabled>ENTRADA<small>Al llegar</small></button>
+    <button type="button" class="big salida" id="btnSalida" disabled>SALIDA<small>Al terminar</small></button>
+  </div>
+  <p class="te-tit">Tiempo extra</p>
+  <div class="botones te">
+    <button type="button" class="mid" id="btnTeIni" disabled>INICIO<small>Empiezo tiempo extra</small></button>
+    <button type="button" class="mid" id="btnTeFin" disabled>FIN<small>Termino tiempo extra</small></button>
+  </div>
+  </div>
+
+  <section class="perm" id="perm" hidden aria-live="polite">
+    <h2>Permanencia en tu turno <span class="chip" id="permChip">Activa</span></h2>
+    <p id="permTxt">Deja esta página abierta durante tu turno.</p>
+    <div class="est info" id="permEst">Esperando la primera verificación…</div>
+    <button type="button" class="sec" id="btnVerificar">Confirmar que sigo aquí</button>
+  </section>
+</main>
+
+<footer>Tu ubicación se toma al registrar y, en las unidades con permanencia obligatoria, cada cierto tiempo mientras esta página siga abierta durante tu turno. La hora que cuenta es la del sistema, no la del celular.</footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTit">
+  <div class="card" id="mCard"></div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { tz: 'America/Hermosillo', offset: 0, unidades: [], lista: true, precMax: 150, modo: 'tel', tok: '',
+    unidad: null, personas: [], persona: null, ocupado: false, permMin: 15, perm: null, wake: null, ultFix: null, idSeq: 0 };
+  var ICON_OK = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#1E6B52" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var ICON_X = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+  var store = {
+    get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { if (v == null) window.localStorage.removeItem(k); else window.localStorage.setItem(k, v); } catch (e) {} }
+  };
+  function dispositivo() {
+    var d = store.get('chk_dispositivo');
+    if (!d) { d = 'D' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5); store.set('chk_dispositivo', d); }
+    return d;
+  }
+  function api(fn, args) {
+    return new Promise(function (res, rej) {
+      if (window.google && google.script && google.script.run) {
+        var r = google.script.run.withSuccessHandler(res).withFailureHandler(function (e) {
+          rej(new Error((e && e.message) || String(e)));
+        });
+        r[fn].apply(r, args || []);
+      } else if (window.API_URL) {
+        fetch(window.API_URL, { method: 'POST', body: JSON.stringify({ fn: fn, args: args || [] }) })
+          .then(function (x) { return x.json(); }).then(res, rej);
+      } else {
+        rej(new Error('No hay conexión con el servidor.'));
+      }
+    });
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function metros(m) { return m < 1000 ? Math.round(m) + ' m' : (m / 1000).toFixed(1).replace(/\.0$/, '') + ' km'; }
+  function dist(a, b, c, d) {
+    var R = 6371000, r = Math.PI / 180, x = (c - a) * r, y = (d - b) * r;
+    var h = Math.pow(Math.sin(x / 2), 2) + Math.cos(a * r) * Math.cos(c * r) * Math.pow(Math.sin(y / 2), 2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function soloDigitos(s) { var d = String(s || '').replace(/\D/g, ''); return d.length > 10 ? d.slice(-10) : d; }
+  function uniPorId(id) { return S.unidades.filter(function (u) { return u.id === id; })[0] || null; }
+
+  /* ---------- Reloj ---------- */
+  var fH, fD;
+  function formatos() {
+    try {
+      fH = new Intl.DateTimeFormat('es-MX', { timeZone: S.tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      fD = new Intl.DateTimeFormat('es-MX', { timeZone: S.tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) {
+      fH = new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      fD = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+  }
+  function tic() {
+    var n = new Date(Date.now() + S.offset);
+    $('hm').textContent = fH.format(n);
+    $('seg').textContent = ':' + pad(n.getSeconds());
+    $('fecha').textContent = fD.format(n);
+  }
+
+  /* ---------- Inicio ---------- */
+  function iniciar() {
+    formatos(); tic(); setInterval(tic, 1000);
+    $('btnTel').addEventListener('click', entrar);
+    $('cvChk').addEventListener('change', function () { $('cvSelBox').hidden = !$('cvChk').checked; if ($('cvChk').checked) $('cvSel').focus(); });
+    $('tel').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pw').focus(); });
+    $('pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') entrar(); });
+    $('verPw').addEventListener('click', function () {
+      var v = $('pw').type === 'password'; $('pw').type = v ? 'text' : 'password'; $('verPw').textContent = v ? 'Ocultar' : 'Ver';
+    });
+    $('aCrear').addEventListener('click', modoCrear);
+    $('aVolver').addEventListener('click', modoTel);
+    $('aOlvide').addEventListener('click', function () { $('olvideTxt').hidden = !$('olvideTxt').hidden; });
+    $('cuU').addEventListener('change', cargarCuentaPersonas);
+    $('btnCrear').addEventListener('click', crearCuenta);
+    $('cuPw2').addEventListener('keydown', function (e) { if (e.key === 'Enter') crearCuenta(); });
+    $('aLista').addEventListener('click', function () { modoLista(); });
+    $('aTel').addEventListener('click', function () { modoTel(); });
+    $('selUnidad').addEventListener('change', cambiarUnidad);
+    $('selPersona').addEventListener('change', cambiarPersona);
+    $('btnEntrada').addEventListener('click', function () { marcar('ENTRADA'); });
+    $('btnSalida').addEventListener('click', function () { marcar('SALIDA'); });
+    $('btnTeIni').addEventListener('click', function () { marcar('TE_INICIO'); });
+    $('btnTeFin').addEventListener('click', function () { marcar('TE_FIN'); });
+    $('btnVerificar').addEventListener('click', function () { verificar(true); });
+    setInterval(function () { revisarPermanencia(); enviarCola(); }, 30000);
+    window.addEventListener('online', function () { enviarCola(); });
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && S.perm) { pedirPantalla(); revisarPermanencia(); }
+      if (document.visibilityState === 'visible') enviarCola();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modal').hidden) cerrarModal(); });
+    window.addEventListener('online', function () { if (S.cfgVieja) cargarDatos(); });
+    cargarDatos();
+  }
+  function cfgGuardada() { try { var c = JSON.parse(store.get('chk_cfg') || 'null'); return c && c.ok ? c : null; } catch (e) { return null; } }
+  function cargarDatos() {
+    api('api_unidades').then(function (r) {
+      if (!r || !r.ok) throw new Error((r && r.error) || 'No se pudieron cargar las unidades.');
+      try { store.set('chk_cfg', JSON.stringify(r)); } catch (e) {}
+      S.cfgVieja = false; $('avisoRed').hidden = true;
+      aplicarCfg(r, false);
+    }).catch(function (e) {
+      var c = cfgGuardada();
+      if (c && !S.unidades.length) { S.cfgVieja = true; $('avisoRed').hidden = false; aplicarCfg(c, true); return; }
+      if (S.unidades.length) return;
+      $('subtitulo').textContent = '';
+      mostrarError('No se pudo conectar', e.message + ' Revisa tu internet y recarga la página.');
+    });
+  }
+  function aplicarCfg(r, vieja) {
+    {
+      S.tz = r.tz || S.tz;
+      S.permMin = r.permanenciaMin || 15;
+      S.lista = r.lista !== false;
+      S.convenio = r.convenio === true;
+      S.precMax = r.precMax || 150;
+      if (r.serverNow && !vieja) S.offset = r.serverNow - Date.now();
+      formatos(); tic();
+      $('titulo').textContent = r.titulo || 'Checador de asistencia';
+      $('subtitulo').textContent = r.subtitulo || '';
+      S.unidades = r.unidades || [];
+      $('aLista').hidden = !S.lista;
+      var sel = $('selUnidad');
+      sel.innerHTML = '<option value="">Elige la unidad</option>' + S.unidades.map(function (u) {
+        var extra = u.ciudad && u.nombre.indexOf(u.ciudad) < 0 ? ' · ' + u.ciudad : '';
+        return '<option value="' + esc(u.id) + '">' + esc(u.nombre + extra) + '</option>';
+      }).join('');
+      sel.disabled = false;
+      $('cuU').innerHTML = sel.innerHTML; $('cuU').disabled = false;
+      pintarCola(); setTimeout(enviarCola, 1500);
+      S.tok = store.get('chk_tok') || '';
+      if (store.get('chk_usuario')) $('tel').value = store.get('chk_usuario');
+      if (store.get('chk_modo') === 'lista' && S.lista) modoLista();
+      else if (S.tok) sesion();
+      else if (!$('tel').value) $('tel').focus();
+    }
+  }
+
+  /* ---------- Cuenta: usuario (celular) y contraseña ---------- */
+  function modoTel() {
+    S.idSeq++;
+    S.modo = 'tel'; store.set('chk_modo', 'tel');
+    $('pasoLista').hidden = true; $('pasoCuenta').hidden = true;
+    S.unidad = null; S.persona = null; detenerPermanencia(); pintarQuien(); actualizarBotones();
+    $('geo').hidden = true;
+    if (S.tok) { $('pasoTel').hidden = true; sesion(); }
+    else { $('pasoTel').hidden = false; ($('tel').value ? $('pw') : $('tel')).focus(); }
+  }
+  function errLogin(msg, html) {
+    if (html) $('telErr').innerHTML = msg; else $('telErr').textContent = msg;
+    $('telErr').hidden = false;
+  }
+  function sesion() {
+    var seq = ++S.idSeq;
+    $('pasoTel').hidden = true;
+    return api('api_sesion', [S.tok]).then(function (r) {
+      if (seq !== S.idSeq) return;
+      if (!r || !r.ok) {
+        if (r && r.sesion === false) cerrarSesion(r.error);
+        else { $('pasoTel').hidden = false; errLogin((r && r.error) || 'No se pudo revisar tu sesión.'); }
+        return;
+      }
+      entrarCon(r.persona);
+    }).catch(function (e) {
+      if (seq !== S.idSeq) return;
+      var p = null; try { p = JSON.parse(store.get('chk_yo') || 'null'); } catch (x) {}
+      if (p && p.id && p.id === S.tok.split('.')[0]) { $('avisoRed').hidden = false; entrarCon(p); return; }
+      $('pasoTel').hidden = false; errLogin(e.message + ' Revisa tu internet.');
+    });
+  }
+  function entrarCon(persona) {
+    S.modo = 'tel'; store.set('chk_modo', 'tel');
+    S.persona = persona;
+    try { store.set('chk_yo', JSON.stringify(persona)); } catch (e) {}
+    S.unidad = uniPorId(persona.unidadId);
+    if (persona.usuario) store.set('chk_usuario', persona.usuario);
+    $('pasoTel').hidden = true; $('pasoCuenta').hidden = true; $('pasoLista').hidden = true;
+    $('telErr').hidden = true; $('pw').value = '';
+    pintarQuien();
+    actualizarPermanencia();
+    actualizarBotones();
+    verificarUbicacion();
+  }
+  function cerrarSesion(msg) {
+    S.idSeq++; S.tok = ''; store.set('chk_tok', null); store.set('chk_yo', null);
+    S.persona = null; S.unidad = null; detenerPermanencia();
+    $('pw').value = ''; $('pasoTel').hidden = false; $('pasoCuenta').hidden = true; $('geo').hidden = true;
+    pintarQuien(); actualizarBotones();
+    if (msg) errLogin(msg); else $('telErr').hidden = true;
+    ($('tel').value ? $('pw') : $('tel')).focus();
+  }
+  function entrar() {
+    $('telErr').hidden = true;
+    var tel = soloDigitos($('tel').value), pw = $('pw').value;
+    if (tel.length !== 10) { errLogin('Tu usuario es tu número de celular a 10 dígitos.'); $('tel').focus(); return Promise.resolve(); }
+    if (!pw) { errLogin('Escribe tu contraseña.'); $('pw').focus(); return Promise.resolve(); }
+    $('btnTel').disabled = true; $('btnTel').textContent = 'Entrando…';
+    var seq = ++S.idSeq;
+    return api('api_entrar', [{ usuario: tel, password: pw }]).then(function (r) {
+      if (seq !== S.idSeq) return;
+      if (!r || !r.ok) {
+        errLogin(esc((r && r.error) || 'No se pudo entrar.') + (r && r.sinCuenta ? ' <button type="button" class="lnk" id="aCrear2">Crear mi cuenta</button>' : ''), true);
+        if ($('aCrear2')) $('aCrear2').onclick = modoCrear;
+        if (r && r.campo === 'pw') { $('pw').value = ''; $('pw').focus(); }
+        return;
+      }
+      S.tok = r.token; store.set('chk_tok', r.token); store.set('chk_usuario', tel);
+      entrarCon(r.persona);
+    }).catch(function (e) {
+      errLogin(e.message);
+    }).then(function () { $('btnTel').disabled = false; $('btnTel').textContent = 'Entrar'; });
+  }
+  function modoCrear() {
+    S.idSeq++;
+    $('pasoTel').hidden = true; $('pasoLista').hidden = true; $('pasoCuenta').hidden = false; $('cuErr').hidden = true;
+    if (!$('cuTel').value && soloDigitos($('tel').value).length === 10) $('cuTel').value = soloDigitos($('tel').value);
+    var prev = store.get('chk_unidad');
+    if (!$('cuU').value && prev && uniPorId(prev)) { $('cuU').value = prev; cargarCuentaPersonas(); }
+  }
+  function cargarCuentaPersonas() {
+    var uid = $('cuU').value, sp = $('cuP');
+    if (!uid) { sp.disabled = true; sp.innerHTML = '<option value="">Primero elige tu unidad</option>'; return Promise.resolve(); }
+    store.set('chk_unidad', uid);
+    sp.disabled = true; sp.innerHTML = '<option value="">Cargando personal…</option>';
+    return api('api_colaboradores', [uid]).then(function (r) {
+      if ($('cuU').value !== uid) return;
+      if (!r || !r.ok) throw new Error((r && r.error) || 'Error al cargar el personal.');
+      var ps = r.colaboradores || [];
+      var opt = function (p) { return '<option value="' + esc(p.id) + '"' + (p.cuenta ? ' disabled' : '') + '>' + esc(p.nombre) + (p.cuenta ? ' (ya tiene cuenta)' : '') + '</option>'; };
+      var propios = ps.filter(function (p) { return !p.cobertura; }), cob = ps.filter(function (p) { return p.cobertura; });
+      var h = ps.length ? '<option value="">Elige tu nombre</option>' : '<option value="">Aún no hay personal registrado en esta unidad</option>';
+      if (propios.length) h += '<optgroup label="Personal de la unidad">' + propios.map(opt).join('') + '</optgroup>';
+      if (cob.length) h += '<optgroup label="Cobertura / supervisión">' + cob.map(opt).join('') + '</optgroup>';
+      sp.innerHTML = h; sp.disabled = !ps.length;
+    }).catch(function (e) {
+      sp.innerHTML = '<option value="">No se pudo cargar el personal</option>';
+      $('cuErr').textContent = e.message; $('cuErr').hidden = false;
+    });
+  }
+  function crearCuenta() {
+    var err = function (m, foco) { $('cuErr').textContent = m; $('cuErr').hidden = false; if (foco) $(foco).focus(); };
+    $('cuErr').hidden = true;
+    var id = $('cuP').value, tel = soloDigitos($('cuTel').value), pw = $('cuPw').value;
+    if (!$('cuU').value) return err('Elige tu unidad.', 'cuU');
+    if (!id) return err('Elige tu nombre.', 'cuP');
+    if (tel.length !== 10) return err('Escribe tu número de celular a 10 dígitos.', 'cuTel');
+    if (pw.length < 6) return err('La contraseña debe tener al menos 6 letras o números.', 'cuPw');
+    if (pw !== $('cuPw2').value) { $('cuPw2').value = ''; return err('Las contraseñas no coinciden. Escríbela otra vez.', 'cuPw2'); }
+    $('btnCrear').disabled = true; $('btnCrear').textContent = 'Creando…';
+    return api('api_crearCuenta', [{ colaboradorId: id, telefono: tel, password: pw, dispositivo: dispositivo() }]).then(function (r) {
+      if (!r || !r.ok) {
+        err((r && r.error) || 'No se pudo crear la cuenta.', r && r.campo === 'tel' ? 'cuTel' : r && r.campo === 'pw' ? 'cuPw' : null);
+        return;
+      }
+      S.tok = r.token; store.set('chk_tok', r.token); store.set('chk_usuario', tel);
+      $('tel').value = tel; $('cuPw').value = ''; $('cuPw2').value = '';
+      entrarCon(r.persona);
+      modal('ok', ICON_OK, 'CUENTA CREADA', '<div class="det">' + esc(r.persona.nombre) + '</div><div class="msg">Tu usuario es tu número <b>' +
+        esc(tel.slice(0, 3) + ' ' + tel.slice(3, 6) + ' ' + tel.slice(6)) + '</b>. Guarda bien tu contraseña: la necesitarás si cambias de celular o cierras sesión.</div>');
+    }).catch(function (e) {
+      err(e.message);
+    }).then(function () { $('btnCrear').disabled = false; $('btnCrear').textContent = 'Crear mi cuenta'; });
+  }
+
+  /* ---------- Identificación con la lista (respaldo) ---------- */
+  function modoLista() {
+    if (!S.lista) return;
+    S.idSeq++;
+    S.modo = 'lista'; store.set('chk_modo', 'lista');
+    $('pasoTel').hidden = true; $('pasoCuenta').hidden = true; $('pasoLista').hidden = false;
+    S.persona = null; pintarQuien(); detenerPermanencia(); actualizarBotones();
+    var prev = store.get('chk_unidad');
+    if (prev && uniPorId(prev)) { $('selUnidad').value = prev; cambiarUnidad(); }
+  }
+  function cambiarUnidad() {
+    var id = $('selUnidad').value;
+    S.unidad = uniPorId(id);
+    S.persona = null; S.personas = [];
+    pintarQuien(); actualizarBotones();
+    var sp = $('selPersona');
+    if (!S.unidad) { sp.disabled = true; sp.innerHTML = '<option>Primero elige la unidad</option>'; $('geo').hidden = true; detenerPermanencia(); return; }
+    store.set('chk_unidad', id);
+    sp.disabled = true; sp.innerHTML = '<option>Cargando personal…</option>';
+    cargarPersonas(store.get('chk_persona'));
+    verificarUbicacion();
+  }
+  function cargarPersonas(preferido) {
+    var uid = S.unidad.id;
+    return api('api_colaboradores', [uid]).then(function (r) {
+      if (!S.unidad || S.unidad.id !== uid) return;
+      if (!r || !r.ok) throw new Error((r && r.error) || 'Error al cargar el personal.');
+      S.personas = r.colaboradores || [];
+      var opt = function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.nombre) + '</option>'; };
+      var propios = S.personas.filter(function (p) { return !p.cobertura; });
+      var cob = S.personas.filter(function (p) { return p.cobertura; });
+      var sp = $('selPersona'), h;
+      if (!S.personas.length) h = '<option value="">Aún no hay personal registrado en esta unidad</option>';
+      else {
+        h = '<option value="">Elige tu nombre</option>';
+        if (propios.length) h += '<optgroup label="Personal de la unidad">' + propios.map(opt).join('') + '</optgroup>';
+        if (cob.length) h += '<optgroup label="Cobertura / supervisión">' + cob.map(opt).join('') + '</optgroup>';
+      }
+      sp.innerHTML = h;
+      sp.disabled = !S.personas.length;
+      if (preferido && S.personas.some(function (p) { return p.id === preferido; })) sp.value = preferido;
+      cambiarPersona();
+    }).catch(function (e) {
+      $('selPersona').innerHTML = '<option>No se pudo cargar el personal</option>';
+      mostrarError('No se pudo cargar el personal', e.message);
+    });
+  }
+  function cambiarPersona() {
+    var id = $('selPersona').value;
+    var p = S.personas.filter(function (x) { return x.id === id; })[0] || null;
+    if (p) { store.set('chk_persona', id); p.unidadId = S.unidad.id; p.unidad = S.unidad.nombre; }
+    S.persona = p;
+    pintarQuien(); actualizarPermanencia(); actualizarBotones();
+  }
+
+  /* ---------- Quién soy y en qué estoy ---------- */
+  function pintarQuien() {
+    var q = $('quien'), p = S.persona;
+    $('pinBox').hidden = !(p && p.pin);
+    if (!p) { q.hidden = true; return; }
+    var linea = [p.puesto, p.turno].filter(Boolean).join(' · ');
+    var sit = [];
+    if (p.abierta) sit.push('Entrada ' + (p.abierta.pendiente ? 'guardada sin internet' : 'registrada') + ' a las <b>' + esc(p.abierta.hora) + '</b>' + (p.abierta.unidad && p.abierta.unidad !== p.unidad ? ' en ' + esc(p.abierta.unidad) : '') + '. Te falta marcar tu <b>SALIDA</b>.');
+    else sit.push('No tienes una entrada abierta. Al llegar, marca tu <b>ENTRADA</b>.');
+    if (p.teAbierto) sit.push('Tiempo extra en curso desde las <b>' + esc(p.teAbierto.hora) + '</b>. Al terminar, marca <b>FIN</b> de tiempo extra.');
+    q.innerHTML = '<div class="nom">' + esc(p.nombre) + '</div>' + esc(p.unidad || '') + (linea ? '<br>' + esc(linea) : '') +
+      '<br>' + sit.join('<br>') +
+      (S.modo === 'tel' ? '<br><button type="button" class="lnk chico" id="noSoy">No soy yo / cerrar sesión</button>' : '');
+    q.hidden = false;
+    if ($('noSoy')) $('noSoy').onclick = function () { $('tel').value = ''; store.set('chk_usuario', null); cerrarSesion(); };
+  }
+
+  function pintarConvenio() {
+    var p = S.persona, uid = !p ? '' : (S.modo === 'tel' ? p.unidadId : (S.unidad && S.unidad.id));
+    var ver = !!(S.convenio && p && !p.abierta && uid);
+    if (!ver) { $('cvOpc').hidden = true; $('cvChk').checked = false; $('cvSelBox').hidden = true; return; }
+    $('cvOpc').hidden = false;
+    $('cvChk').disabled = !!S.ocupado; $('cvSel').disabled = !!S.ocupado;
+    var clave = uid + '|' + p.id;
+    if (S.cvClave === clave) return;
+    S.cvClave = clave;
+    $('cvSel').innerHTML = '<option value="">Cargando personal…</option>';
+    api('api_colaboradores', [uid]).then(function (r) {
+      if (S.cvClave !== clave) return;
+      var ps = (r && r.colaboradores || []).filter(function (x) { return x.id !== p.id && !x.cobertura; });
+      $('cvSel').innerHTML = '<option value="">Elige a la persona</option>' + ps.map(function (x) {
+        return '<option value="' + esc(x.id) + '">' + esc(x.nombre) + (x.turno ? ' · ' + esc(x.turno) : '') + '</option>';
+      }).join('');
+    }).catch(function () { S.cvClave = ''; $('cvSel').innerHTML = '<option value="">No se pudo cargar la lista</option>'; });
+  }
+  function actualizarBotones() {
+    var p = S.persona, listo = !!p && !S.ocupado;
+    $('acciones').hidden = S.modo === 'tel' && !p;
+    pintarConvenio();
+    $('btnEntrada').disabled = !listo;
+    $('btnSalida').disabled = !listo;
+    $('btnTeIni').disabled = !listo || !!(p && p.teAbierto);
+    $('btnTeFin').disabled = !listo || !(p && p.teAbierto);
+    $('btnEntrada').classList.toggle('sugerido', listo && !p.abierta && !p.teAbierto);
+    $('btnSalida').classList.toggle('sugerido', listo && !!p.abierta && !p.teAbierto);
+    $('btnTeFin').classList.toggle('sugerido', listo && !!p.teAbierto);
+  }
+
+  /* ---------- Ubicación ---------- */
+  function ubicar(fresca) {
+    return new Promise(function (res, rej) {
+      if (!navigator.geolocation) return rej(new Error('Este navegador no puede dar la ubicación. Usa Chrome o Safari actualizados.'));
+      navigator.geolocation.getCurrentPosition(function (p) {
+        res({ lat: p.coords.latitude, lng: p.coords.longitude, acc: Math.round(p.coords.accuracy || 0) });
+      }, function (e) {
+        var m = (e && e.code === 1)
+          ? 'El permiso de ubicación está bloqueado. Toca el candado o el ícono junto a la dirección de la página, entra a Permisos y permite la Ubicación. Después vuelve a intentar.'
+          : (e && e.code === 3)
+            ? 'No se obtuvo la ubicación a tiempo. Acércate a una ventana o sal al exterior y vuelve a intentar.'
+            : 'No se pudo obtener la ubicación. Revisa que la Ubicación (GPS) del celular esté encendida.';
+        rej(new Error(m));
+      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: fresca ? 10000 : 60000 });
+    });
+  }
+  function verificarUbicacion() {
+    var g = $('geo');
+    if (!S.persona && !S.unidad) return;
+    g.hidden = false; g.className = 'geo info'; g.textContent = 'Buscando tu ubicación…';
+    ubicar(false).then(pintarGeo).catch(function (e) {
+      g.className = 'geo bad';
+      g.innerHTML = esc(e.message) + ' <button type="button" class="lnk" id="reGeo">Reintentar</button>';
+      $('reGeo').onclick = verificarUbicacion;
+    });
+  }
+  function dentroDe(u, f) { return u && u.lat != null && dist(u.lat, u.lng, f.lat, f.lng) - Math.min(f.acc, 50) <= u.radio; }
+  function pintarGeo(f) {
+    S.ultFix = f;
+    if (S.modo === 'tel' && !S.persona) return;
+    var g = $('geo'), act = ' <button type="button" class="lnk" id="reGeo">Actualizar</button>', txt, cls;
+    var acc = ' (GPS ±' + f.acc + ' m)';
+    var u = S.modo === 'lista' ? S.unidad : uniPorId(S.persona ? S.persona.unidadId : '');
+    if (S.modo === 'tel') {
+      var dentro = S.unidades.filter(function (x) { return dentroDe(x, f); })
+        .sort(function (a, b) { return dist(a.lat, a.lng, f.lat, f.lng) - dist(b.lat, b.lng, f.lat, f.lng); });
+      var conC = S.unidades.filter(function (x) { return x.lat != null; })
+        .sort(function (a, b) { return dist(a.lat, a.lng, f.lat, f.lng) - dist(b.lat, b.lng, f.lat, f.lng); });
+      if (u && dentroDe(u, f)) { cls = 'ok'; txt = '&#10003; Estás en tu unidad: ' + esc(u.nombre) + ' (a ' + metros(dist(u.lat, u.lng, f.lat, f.lng)) + ')'; }
+      else if (dentro.length) { var o = dentro[0]; cls = 'warn'; txt = 'Estás en ' + esc(o.nombre) + ' (a ' + metros(dist(o.lat, o.lng, f.lat, f.lng)) + '). No es tu unidad asignada: se registrará como cobertura y se avisará a supervisión.'; }
+      else if (u && u.lat == null) { cls = 'warn'; txt = 'Tu unidad todavía no tiene su ubicación configurada. Tu registro se guardará con tu ubicación para revisión.'; }
+      else if (conC.length) { var n = u && u.lat != null ? u : conC[0]; cls = 'bad'; txt = '&#10007; Estás fuera del área: a ' + metros(dist(n.lat, n.lng, f.lat, f.lng)) + ' de ' + esc(n.nombre) + '. Para registrar debes estar a menos de ' + metros(n.radio) + '.'; }
+      else { cls = 'info'; txt = 'Ubicación obtenida.'; }
+    } else {
+      if (!u) return;
+      if (u.lat == null) { cls = 'warn'; txt = 'Esta unidad todavía no tiene su ubicación configurada. Tu registro se guardará con tu ubicación para revisión.'; }
+      else {
+        var d = dist(u.lat, u.lng, f.lat, f.lng), ok = dentroDe(u, f);
+        cls = ok ? 'ok' : 'bad';
+        txt = (ok ? '&#10003; Estás dentro del área de la unidad' : '&#10007; Estás fuera del área de la unidad') + ' (a ' + metros(d) + '; se permite hasta ' + metros(u.radio) + ')';
+      }
+    }
+    if (f.acc > S.precMax) { cls = 'warn'; txt = 'Tu ubicación todavía es poco precisa' + acc + '. Enciende la ubicación precisa, acércate a una ventana y toca Actualizar.'; acc = ''; }
+    g.hidden = false; g.className = 'geo ' + cls; g.innerHTML = txt + acc + '.' + act;
+    $('reGeo').onclick = verificarUbicacion;
+  }
+
+  /* ---------- Registrar ---------- */
+  var NOMBRES = { ENTRADA: 'ENTRADA', SALIDA: 'SALIDA', TE_INICIO: 'INICIO', TE_FIN: 'FIN' };
+  function marcar(tipo) {
+    if (S.ocupado || !S.persona) return;
+    var p = S.persona, pin = $('pin').value.trim();
+    if (p.pin && !pin) { mostrarError('Falta tu PIN', 'Escribe tu PIN para poder registrar.'); return; }
+    var cubreA = tipo === 'ENTRADA' && !$('cvOpc').hidden && $('cvChk').checked ? $('cvSel').value : '';
+    if (tipo === 'ENTRADA' && !$('cvOpc').hidden && $('cvChk').checked && !cubreA) {
+      mostrarError('Falta un dato', 'Elige a quién cubres, o quita la marca de convenio.'); return;
+    }
+    S.ocupado = true; actualizarBotones();
+    var btn = { ENTRADA: $('btnEntrada'), SALIDA: $('btnSalida'), TE_INICIO: $('btnTeIni'), TE_FIN: $('btnTeFin') }[tipo], txt = btn.innerHTML;
+    var d = null, captura = 0;
+    btn.innerHTML = 'UBICANDO…<small>Un momento</small>';
+    ubicar(true).then(function (f) {
+      btn.innerHTML = 'GUARDANDO…<small>No cierres la página</small>';
+      pintarGeo(f);
+      captura = Date.now();
+      d = { tipo: tipo, pin: pin, lat: f.lat, lng: f.lng, acc: f.acc, dispositivo: dispositivo(), idLocal: nuevoId() };
+      if (cubreA) d.cubreA = cubreA;
+      if (S.modo === 'tel') d.token = S.tok; else { d.unidadId = S.unidad.id; d.colaboradorId = p.id; }
+      // Sin internet (o con registros esperando): se guarda en el celular para no perder el orden.
+      if (leerCola().length || navigator.onLine === false) return { sinRed: true };
+      return conTiempo(api('api_marcar', [d]), 20000).catch(function () { return { sinRed: true }; });
+    }).then(function (r) {
+      if (r && r.sinRed) { guardarSinRed(tipo, d, captura); return; }
+      if (!r || !r.ok) {
+        if (r && r.sesion === false && S.modo === 'tel') { cerrarSesion(r.error); return; }
+        if (r && r.campo === 'pin') $('pin').value = '';
+        mostrarError(r && r.fuera ? 'Fuera del área' : r && r.impreciso ? 'Ubicación poco precisa' : 'No se registró', (r && r.error) || 'Intenta de nuevo.');
+        return;
+      }
+      $('pin').value = '';
+      mostrarExito(r);
+      try { if (navigator.vibrate) navigator.vibrate(150); } catch (e) {}
+      return refrescar();
+    }).catch(function (e) {
+      mostrarError('No se registró', e.message || String(e));
+    }).then(function () {
+      btn.innerHTML = txt; S.ocupado = false; actualizarBotones();
+    });
+  }
+  function refrescar() {
+    if (S.modo === 'tel') return sesion();
+    return cargarPersonas(S.persona ? S.persona.id : null);
+  }
+
+  /* ---------- Permanencia ---------- */
+  function actualizarPermanencia() {
+    var p = S.persona;
+    if (!p || !p.abierta || !(p.abierta.folio || p.abierta.pendiente)) { detenerPermanencia(); return; }
+    var u = uniPorId(p.abierta.unidadId) || S.unidad;
+    if (!u || u.perm === false || u.lat == null) {
+      detenerPermanencia();
+      if (u && u.perm === false) {
+        $('perm').hidden = false;
+        $('permChip').textContent = 'Libre';
+        $('permTxt').textContent = 'En ' + u.nombre + ' tienes permitido salir del área durante tu turno. Recuerda marcar tu SALIDA al terminar.';
+        $('permEst').className = 'est info'; $('permEst').textContent = 'Entrada a las ' + p.abierta.hora + '.';
+        $('btnVerificar').hidden = true;
+      }
+      return;
+    }
+    $('btnVerificar').hidden = false;
+    iniciarPermanencia(p, u);
+  }
+  function iniciarPermanencia(p, u) {
+    var ab = p.abierta, clave = ab.folio || ab.idLocal;
+    if (S.perm && S.perm.clave === clave) return;
+    S.perm = { clave: clave, folio: ab.folio || '', fila: ab.fila || '', ent: ab.folio ? '' : ab.idLocal, colaboradorId: p.id, ultimo: Date.now(), n: 0 };
+    $('perm').hidden = false;
+    $('permChip').textContent = 'Obligatoria';
+    $('permTxt').textContent = 'En ' + u.nombre + ' debes permanecer dentro del área durante tu turno. Deja esta página abierta y con la pantalla encendida: cada ' + S.permMin + ' minutos se confirma tu ubicación. Si la cierras, se avisa a supervisión; al volver a abrirla se reanuda.';
+    $('permEst').className = 'est info';
+    $('permEst').textContent = 'Entrada a las ' + ab.hora + '. La primera verificación será en unos minutos.';
+    pedirPantalla();
+  }
+  function detenerPermanencia() {
+    S.perm = null;
+    $('perm').hidden = true;
+    try { if (S.wake) { S.wake.release(); S.wake = null; } } catch (e) {}
+  }
+  function pedirPantalla() {
+    try {
+      if (navigator.wakeLock && !S.wake) navigator.wakeLock.request('screen').then(function (w) { S.wake = w; w.addEventListener('release', function () { S.wake = null; }); }).catch(function () {});
+    } catch (e) {}
+  }
+  function revisarPermanencia() {
+    if (S.perm && !S.ocupado && Date.now() - S.perm.ultimo >= S.permMin * 60000) verificar(false);
+  }
+  function verificar(manual) {
+    var p = S.perm;
+    if (!p || p.enCurso) return;
+    p.enCurso = true; p.ultimo = Date.now();
+    var b = $('btnVerificar');
+    if (manual) { b.disabled = true; b.textContent = 'Verificando…'; }
+    ubicar(true).then(function (f) {
+      pintarGeo(f);
+      var captura = Date.now();
+      var d = { folio: p.folio, fila: p.fila, colaboradorId: p.colaboradorId, lat: f.lat, lng: f.lng, acc: f.acc, manual: !!manual, idLocal: nuevoId() };
+      var guardar = function () {
+        encolar({ id: d.idLocal, fn: 'api_permanencia', d: d, captura: captura, offset: S.offset, ent: p.ent || '', hora: horaLocal(captura) });
+        var ab = S.persona && S.persona.abierta, u = uniPorId(ab && ab.unidadId) || S.unidad;
+        var conU = u && u.lat != null;
+        return { ok: true, local: true, hora: horaLocal(captura), dentro: conU ? dentroDe(u, f) : null, distancia: conU ? dist(u.lat, u.lng, f.lat, f.lng) : null };
+      };
+      if (p.ent || leerCola().length || navigator.onLine === false) return guardar();
+      return conTiempo(api('api_permanencia', [d]), 20000).catch(function () { return guardar(); });
+    }).then(function (r) {
+      if (!r || !r.ok) {
+        if (r && r.cerrada) { detenerPermanencia(); return; }
+        throw new Error((r && r.error) || 'No se pudo verificar.');
+      }
+      var e = $('permEst');
+      if (r.local) {
+        e.className = r.dentro === false ? 'est bad' : 'est info';
+        e.innerHTML = (r.dentro === false ? '&#10007; ' + r.hora + ': estás fuera del área (a ' + metros(r.distancia) + '). Regresa a tu unidad.'
+          : '&#10003; ' + r.hora + ': ubicación guardada' + (r.distancia != null ? ' (a ' + metros(r.distancia) + ')' : '')) +
+          ' Sin internet: se enviará en cuanto regrese la señal.';
+        return;
+      }
+      if (r.dentro === false) {
+        e.className = 'est bad';
+        e.innerHTML = '&#10007; ' + r.hora + ': estás fuera del área (a ' + metros(r.distancia) + '). Quedó anotado y se avisó a supervisión. Regresa a tu unidad.';
+        try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (x) {}
+      } else {
+        e.className = 'est ok';
+        e.innerHTML = '&#10003; ' + r.hora + ': sigues en la unidad' + (r.distancia != null ? ' (a ' + metros(r.distancia) + ')' : '') + '.';
+      }
+      $('permChip').textContent = r.verificaciones + ' verificación' + (r.verificaciones === 1 ? '' : 'es');
+    }).catch(function (err) {
+      $('permEst').className = 'est bad';
+      $('permEst').textContent = err.message + ' Se volverá a intentar.';
+      p.ultimo = Date.now() - (S.permMin - 2) * 60000;
+    }).then(function () {
+      p.enCurso = false;
+      b.disabled = false; b.textContent = 'Confirmar que sigo aquí';
+    });
+  }
+
+  /* ---------- Registros guardados sin internet ---------- */
+  function leerJSON(k, def) { try { var v = JSON.parse(store.get(k) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
+  function leerCola() { var c = leerJSON('chk_cola', []); return Array.isArray(c) ? c : []; }
+  function guardarCola(c) { store.set('chk_cola', c.length ? JSON.stringify(c) : null); pintarCola(); }
+  function encolar(it) { var c = leerCola(); c.push(it); guardarCola(c); }
+  function nuevoId() { return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function horaLocal(ms) { return fH.format(new Date(ms + S.offset)); }
+  function conTiempo(pr, ms) {
+    return new Promise(function (res, rej) {
+      var t = setTimeout(function () { rej(new Error('Sin respuesta del servidor.')); }, ms);
+      pr.then(function (x) { clearTimeout(t); res(x); }, function (e) { clearTimeout(t); rej(e); });
+    });
+  }
+  var NOMBRE_LARGO = { ENTRADA: 'ENTRADA', SALIDA: 'SALIDA', TE_INICIO: 'INICIO de tiempo extra', TE_FIN: 'FIN de tiempo extra' };
+  function pintarCola(listo) {
+    var c = leerCola(), el = $('cola');
+    if (!c.length) {
+      if (listo) { el.className = 'geo ok'; el.textContent = listo; el.hidden = false; setTimeout(function () { if (!leerCola().length) el.hidden = true; }, 15000); }
+      else el.hidden = true;
+      return;
+    }
+    var m = c.filter(function (x) { return x.fn === 'api_marcar'; });
+    el.className = 'geo warn';
+    el.innerHTML = '<b>Pendiente de enviar:</b> ' + (m.length ? m.map(function (x) { return esc(NOMBRE_LARGO[x.tipo] || x.tipo) + ' de las ' + esc(x.hora); }).join(', ') : 'tus verificaciones de permanencia') +
+      '. Está guardado en este celular y se envía solo en cuanto haya internet. No cierres esta página ni borres los datos del navegador. <button type="button" class="lnk" id="btnCola">Enviar ahora</button>';
+    el.hidden = false;
+    $('btnCola').onclick = function () { enviarCola(true); };
+  }
+  function guardarSinRed(tipo, d, captura) {
+    var p = S.persona, f = { lat: d.lat, lng: d.lng, acc: d.acc };
+    var propia = S.modo === 'tel' ? uniPorId(p.unidadId) : S.unidad;
+    var conC = S.modo === 'tel' ? S.unidades.filter(function (u) { return u.lat != null; }) : (S.unidad && S.unidad.lat != null ? [S.unidad] : []);
+    var validar = propia ? propia.lat != null : conC.length > 0;
+    if (validar && d.acc > S.precMax) { mostrarError('Ubicación poco precisa', 'Tu ubicación no es precisa (±' + Math.round(d.acc) + ' m). Enciende la ubicación precisa del celular, espera unos segundos y vuelve a intentar.'); return; }
+    var dentro = conC.filter(function (u) { return dentroDe(u, f); })
+      .sort(function (a, b) { return dist(a.lat, a.lng, f.lat, f.lng) - dist(b.lat, b.lng, f.lat, f.lng); });
+    if (validar && !dentro.length) {
+      var ref = propia && propia.lat != null ? propia : conC[0];
+      mostrarError('Fuera del área', 'Estás a ' + metros(dist(ref.lat, ref.lng, f.lat, f.lng)) + ' de ' + ref.nombre + '. Para registrar debes estar a menos de ' + metros(ref.radio) + '.');
+      return;
+    }
+    if (tipo === 'ENTRADA' && p.abierta) { mostrarError('No se registró', 'Ya tienes una entrada a las ' + p.abierta.hora + '. Si ya terminaste tu jornada, marca SALIDA.'); return; }
+    if (tipo === 'TE_INICIO' && p.teAbierto) { mostrarError('No se registró', 'Ya tienes tiempo extra en curso desde las ' + p.teAbierto.hora + '. Al terminar marca FIN.'); return; }
+    if (tipo === 'TE_FIN' && !p.teAbierto) { mostrarError('No se registró', 'No tienes tiempo extra abierto. Primero marca INICIO de tiempo extra.'); return; }
+    var hora = horaLocal(captura);
+    encolar({ id: d.idLocal, fn: 'api_marcar', d: d, captura: captura, offset: S.offset, tipo: tipo, hora: hora });
+    var uEn = propia && dentro.indexOf(propia) >= 0 ? propia : (dentro[0] || propia);
+    if (tipo === 'ENTRADA') p.abierta = { hora: hora, unidad: uEn ? uEn.nombre : p.unidad, unidadId: uEn ? uEn.id : '', pendiente: true, idLocal: d.idLocal };
+    else if (tipo === 'SALIDA') p.abierta = null;
+    else if (tipo === 'TE_INICIO') p.teAbierto = { hora: hora, pendiente: true };
+    else p.teAbierto = null;
+    $('pin').value = '';
+    pintarQuien(); actualizarPermanencia(); actualizarBotones();
+    var seg = new Date(captura + S.offset).getSeconds();
+    modal('ok', ICON_OK, 'GUARDADO SIN INTERNET', '<div class="hora">' + esc(hora) + ':' + pad(seg) + '</div><div class="det">' + esc(p.nombre) + '<br>' + esc(NOMBRE_LARGO[tipo]) +
+      (uEn ? ' · ' + esc(uEn.nombre) : '') + (d.cubreA ? '<br>Convenio: cubres a ' + esc(($('cvSel').selectedOptions[0] || {}).textContent || '') : '') + '</div><div class="obs">No hay internet en este momento. Tu registro quedó guardado en este celular con la hora y la ubicación de este momento, y se enviará solo en cuanto regrese la señal. <b>No cierres esta página.</b></div>');
+    try { if (navigator.vibrate) navigator.vibrate(150); } catch (e) {}
+    setTimeout(enviarCola, 3000);
+  }
+  function enviarCola(manual) {
+    if (S.enviando || !leerCola().length) return Promise.resolve();
+    S.enviando = true;
+    var enviados = 0, fallas = [], folios = leerJSON('chk_folios', {});
+    var quitar = function (id) { guardarCola(leerCola().filter(function (x) { return x.id !== id; })); };
+    var siguiente = function () {
+      var c = leerCola();
+      if (!c.length) return Promise.resolve();
+      var it = c[0], d = {};
+      Object.keys(it.d || {}).forEach(function (k) { d[k] = it.d[k]; });
+      d.diferido = { captura: it.captura, envio: Date.now(), offset: it.offset || 0 };
+      if (it.ent) {
+        var fo = folios[it.ent];
+        if (!fo) { quitar(it.id); return siguiente(); } // su entrada no llegó a guardarse
+        d.folio = fo.folio; d.fila = fo.fila;
+      }
+      return conTiempo(api(it.fn, [d]), 25000).then(function (r) {
+        quitar(it.id);
+        if (it.fn === 'api_marcar') {
+          enviados++;
+          if (r && r.ok && it.tipo === 'ENTRADA') {
+            folios[it.d.idLocal] = { folio: r.folio, fila: r.fila };
+            var ks = Object.keys(folios); if (ks.length > 20) delete folios[ks[0]];
+            store.set('chk_folios', JSON.stringify(folios));
+          }
+          if (!r || !r.ok) fallas.push((NOMBRE_LARGO[it.tipo] || it.tipo) + ' de las ' + it.hora + ': ' + ((r && r.error) || 'no se pudo guardar.'));
+        }
+        return siguiente();
+      });
+    };
+    return siguiente().then(function () {
+      S.enviando = false;
+      pintarCola(enviados ? 'Listo: ya se enviaron tus registros guardados sin internet.' : '');
+      if (fallas.length) mostrarError('No se pudo guardar un registro', fallas.join(' · '));
+      if (enviados && (S.modo === 'tel' ? S.tok : S.unidad)) return refrescar();
+    }, function () {
+      S.enviando = false;
+      pintarCola();
+      if (manual) mostrarError('Todavía sin internet', 'Tus registros siguen guardados en este celular y se enviarán solos cuando regrese la señal.');
+    });
+  }
+
+  /* ---------- Avisos ---------- */
+  var temporizador = null;
+  function modal(clase, icono, titulo, cuerpo) {
+    var c = $('mCard');
+    c.className = 'card ' + clase;
+    c.innerHTML = '<div class="ic">' + icono + '</div><h2 id="mTit">' + titulo + '</h2>' + cuerpo +
+      '<button type="button" class="acc" id="mOk">Aceptar</button>';
+    $('modal').hidden = false;
+    $('mOk').onclick = cerrarModal;
+    try { $('mOk').focus(); } catch (e) {}
+    clearTimeout(temporizador);
+    if (clase === 'ok') temporizador = setTimeout(cerrarModal, 15000);
+  }
+  function cerrarModal() { $('modal').hidden = true; clearTimeout(temporizador); }
+  function mostrarExito(r) {
+    var titulo = { ENTRADA: 'ENTRADA REGISTRADA', SALIDA: 'SALIDA REGISTRADA', TE_INICIO: 'TIEMPO EXTRA INICIADO', TE_FIN: 'TIEMPO EXTRA TERMINADO' }[r.tipo] || 'REGISTRADO';
+    var det = esc(r.nombre) + '<br>' + esc(r.unidad) + '<br>' + esc(r.estado) +
+      (r.distancia != null ? ' · a ' + metros(r.distancia) + ' de la unidad' : '') +
+      (r.tipo === 'SALIDA' && r.horas ? '<br>Tiempo de jornada: <b>' + esc(r.horas) + ' h</b>' : '') +
+      (r.tipo === 'TE_FIN' && r.horas !== '' ? '<br>Tiempo extra checado: <b>' + esc(r.horas) + ' h</b>' : '');
+    var obs = r.obs && r.obs.length ? '<div class="obs"><b>Quedó anotado:</b><br>' + r.obs.map(esc).join('<br>') + '</div>' : '';
+    modal('ok', ICON_OK, titulo, '<div class="hora">' + esc(r.hora) + '</div><div class="det">' + det + '</div>' + obs);
+  }
+  function mostrarError(titulo, msg) {
+    modal('bad', ICON_X, esc(titulo), '<div class="msg">' + esc(msg) + '</div>');
+  }
+
+  iniciar();
+})();
+</script>
+<script>if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
+</body>
+</html>
