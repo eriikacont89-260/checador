@@ -1,6 +1,6 @@
 // Guarda la página en el celular para que abra aunque no haya internet.
 // Solo maneja archivos de este mismo sitio; las llamadas al servidor (Google) no pasan por aquí.
-var CACHE = 'checador-b9d6fb60a9';
+var CACHE = 'checador-cddca4aa28';
 var ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icono-180.png', './icono-192.png', './icono-512.png'];
 
 self.addEventListener('install', function (e) {
